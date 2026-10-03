@@ -1,32 +1,36 @@
 #!/usr/bin/env python3
 """
-Category effects (t-tests) for brain coverage QC metrics.
+Category effects on brain coverage QC metrics (Welch's t-tests).
 
-For each of the four coverage QC tasks (full brain, upper cerebrum,
-lower cerebrum, cerebellum/midbrain), this script runs three pairwise
-Welch's t-tests comparing quantitative coverage (%) across the manual
-visual QC categories:
+For each of the four coverage QC tasks (full brain, superior cerebrum,
+inferior cerebrum, cerebellum/midbrain), runs three pairwise Welch's
+t-tests comparing coverage (%) across visual QC categories:
     - full vs cropped
     - full vs minimally cropped
     - minimally cropped vs cropped
 
-Output: a single CSV of all test results, saved to the "group_comparisons"
-results folder.
+Outputs:
+    - CSV of test results (n, means, SDs, t, df, p, Cohen's d) for all tasks
 """
 
 import os
+
 import pandas as pd
 from scipy import stats
+
 
 # ----------------------------------------------------------------------
 # CONFIG
 # ----------------------------------------------------------------------
-INPUT_DATA_PATH = "/your/base/path/input_files/full_coverage_and_ratings_data.csv"
-OUTPUT_DIR = "/your/base/path/results/group_comparisons"
+INPUT_DATA_PATH = "/path/to/your/input/data/input_data.csv"
+OUTPUT_DIR = "/path/to/your/output/folder"
+
+OUTPUT_CSV_NAME = "category_effects_ttests.csv"
 
 TASKS = ["full_brain", "superior_cerebrum", "inferior_cerebrum", "cerebellum_and_midbrain"]
 
-# (group_a, group_b) pairwise comparisons per task
+# Pairwise comparisons per task, as (group_a, group_b),
+# reported as group_a minus group_b.
 COMPARISONS = [
     ("full", "cropped"),
     ("full", "minimally cropped"),
@@ -34,6 +38,9 @@ COMPARISONS = [
 ]
 
 
+# ----------------------------------------------------------------------
+# STATISTICS
+# ----------------------------------------------------------------------
 def welch_df(a, b):
     """Welch-Satterthwaite degrees of freedom (computed manually for
     compatibility with older scipy versions that don't expose
@@ -55,6 +62,7 @@ def cohens_d(a, b):
 
 
 def run_ttests(df):
+    """Run all pairwise Welch's t-tests for every task."""
     rows = []
     for task in TASKS:
         cov_col = f"coverage_{task}"
@@ -107,13 +115,16 @@ def run_ttests(df):
     return pd.DataFrame(rows)
 
 
+# ----------------------------------------------------------------------
+# MAIN
+# ----------------------------------------------------------------------
 def main():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
     df = pd.read_csv(INPUT_DATA_PATH)
     results = run_ttests(df)
 
-    out_path = os.path.join(OUTPUT_DIR, "category_effects_ttests.csv")
+    out_path = os.path.join(OUTPUT_DIR, OUTPUT_CSV_NAME)
     results.to_csv(out_path, index=False)
     print(f"Saved {len(results)} test results to {out_path}")
     print(results.to_string(index=False))

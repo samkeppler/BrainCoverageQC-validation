@@ -1,26 +1,20 @@
 #!/usr/bin/env python3
-# =============================================================================
-# Purpose: Evaluate classification performance (precision/recall) of two
-#          alternative brain coverage metrics against visually assessed
-#          full-brain DWI cropping, using predefined coverage thresholds.
-#
-#          Metrics compared:
-#            1) full_brain_mask coverage
-#            2) regional_masks (min of sub-region masks) coverage
-#
-#          Classification rule: predict "full" if coverage >= threshold,
-#          evaluated at each of several predefined thresholds.
-#
-#          Tasks (positive class = "full" in both):
-#            1) full_vs_cropped_excl_minimal
-#               - minimally_cropped rows dropped entirely
-#               - full = 1, cropped = 0
-#            2) full_vs_cropped_minimal_as_full
-#               - minimally_cropped grouped WITH full
-#               - full & minimally_cropped = 1, cropped = 0
-#
-# Created on 03/04/2026 by Samantha Keppler
-# =============================================================================
+"""
+Precision/recall of brain coverage metrics at predefined thresholds.
+
+Evaluates how well two coverage metrics (full brain mask coverage and
+minimum regional mask coverage) classify visually assessed full-brain
+DWI cropping, predicting "full" when coverage >= threshold at each of
+several predefined thresholds. Run for two classification tasks
+(positive class = "full" in both):
+    - Full vs. Cropped (minimally cropped rows excluded)
+    - (Full + Minimally Cropped) vs. Cropped
+
+Outputs:
+    - CSV of precision, recall, and confusion counts per task/metric/threshold
+    - PR curve figure per task (full brain mask, with average precision)
+    - Confusion matrix grid figure per task (metrics x thresholds)
+"""
 
 import os
 import re
@@ -33,70 +27,52 @@ from sklearn.metrics import precision_recall_curve, average_precision_score
 import matplotlib.pyplot as plt
 
 
-# =============================================================================
-# CONFIGURATION
-# =============================================================================
+# ----------------------------------------------------------------------
+# CONFIG
+# ----------------------------------------------------------------------
+INPUT_DATA_PATH = "/path/to/your/input/data/input_data.csv"
+OUTPUT_DIR = "/path/to/your/output/folder"
 
-CONFIG = {
-    "base_path": "/your/base/path",
+OUTPUT_CSV_NAME = "predefined_threshold_results.csv"
+PR_CURVE_FIG_TEMPLATE = "pr_curve_{task}.png"
+CONFUSION_MATRIX_FIG_TEMPLATE = "confusion_matrices_{task}.png"
 
-    # Input file (combined CSV with full-brain visual QC and comparison metrics)
-    "input_csv": "{base}/input_files/pr_analysis_data.csv",
+# Coverage thresholds (%) to evaluate
+THRESHOLDS = [98, 95, 92]
 
-    # Predefined coverage thresholds to evaluate (same scale as the coverage
-    # columns, which are 0-100 percentages, not 0-1 fractions).
-    "thresholds": [98, 95, 92],
+# Full-brain visual QC label column
+LABEL_COL = "visual_qc_full_brain"
 
-    # Full-brain visual QC label column
-    "label_col": "visual_qc_full_brain",
+# Coverage metrics, in plotting/output order
+METRIC_ORDER = [
+    "full_brain_mask",
+    "regional_masks",
+]
 
-    # Coverage metrics to compare in order
-    "metric_order": [
-        "full_brain_mask",
-        "regional_masks",
-    ],
-
-    # Coverage metric column mappings
-    "coverage_cols": {
-        "full_brain_mask": ("coverage_full_brain_mask", None),
-        "regional_masks": ("min_coverage_regional_masks", None),
-    },
-
-    # Pretty labels for plots / output readability
-    "metric_display_names": {
-        "full_brain_mask": "Full Brain Mask",
-        "regional_masks": "Regional Masks",
-    },
-
-    # Classification tasks (positive class = "full" in every case)
-    "tasks": [
-        ("full_vs_cropped_excl_minimal", "Full vs. Cropped"),
-        ("full_vs_cropped_minimal_as_full", "(Full + Minimally Cropped) vs. Cropped"),
-    ],
+# Metric -> (preferred column, fallback column)
+COVERAGE_COLS = {
+    "full_brain_mask": ("coverage_full_brain_mask", None),
+    "regional_masks": ("min_coverage_regional_masks", None),
 }
 
+METRIC_DISPLAY_NAMES = {
+    "full_brain_mask": "Full Brain Mask",
+    "regional_masks": "Regional Masks",
+}
 
-def build_runtime_config(config: Dict[str, Any]) -> Dict[str, Any]:
-    out = dict(config)
-    base = out["base_path"]
-
-    out["output_dir"] = f"{base}/results/predefined_thresholds"
-    out["output_csv"] = f"{out['output_dir']}/predefined_threshold_results.csv"
-    out["output_pr_png_template"] = f"{out['output_dir']}/pr_curve_{{task}}.png"
-    out["output_cm_png_template"] = f"{out['output_dir']}/confusion_matrices_{{task}}.png"
-
-    return out
+# Classification tasks as (task code, display description)
+TASKS = [
+    ("full_vs_cropped_excl_minimal", "Full vs. Cropped"),
+    ("full_vs_cropped_minimal_as_full", "(Full + Minimally Cropped) vs. Cropped"),
+]
 
 
-# =============================================================================
-# HELPERS
-# =============================================================================
-
+# ----------------------------------------------------------------------
+# CLASSIFICATION
+# ----------------------------------------------------------------------
 def parse_visual_label(x) -> str:
-    """
-    Map free-text visual QC values to one of:
-      cropped, minimally_cropped, full, unknown
-    """
+    """Map free-text visual QC values to one of:
+    cropped, minimally_cropped, full, unknown."""
     if pd.isna(x):
         return "unknown"
 
@@ -114,21 +90,18 @@ def parse_visual_label(x) -> str:
 
 
 def make_binary(labels: np.ndarray, task: str) -> np.ndarray:
-    """
-    Convert 3-way labels into binary outcome for a given task.
-    Positive class (1) is always "full" (possibly grouped with
-    minimally_cropped, depending on task). Returns NaN where the
-    label is unknown/unusable for that task.
-    """
+    """Convert 3-way labels to a binary outcome for a given task.
+    Positive class (1) is always "full" (grouped with minimally_cropped
+    for the minimal_as_full task). Returns NaN where the label is
+    unknown or excluded for that task."""
     y = np.full(len(labels), np.nan)
 
     if task == "full_vs_cropped_excl_minimal":
-        # minimally_cropped dropped entirely
+        # minimally_cropped left as NaN, i.e. dropped
         y[labels == "full"] = 1
         y[labels == "cropped"] = 0
 
     elif task == "full_vs_cropped_minimal_as_full":
-        # minimally_cropped grouped with full
         y[(labels == "full") | (labels == "minimally_cropped")] = 1
         y[labels == "cropped"] = 0
 
@@ -139,6 +112,7 @@ def make_binary(labels: np.ndarray, task: str) -> np.ndarray:
 
 
 def resolve_col(df: pd.DataFrame, preferred: Optional[str], fallback: Optional[str]) -> Optional[str]:
+    """Return the preferred column if present, else the fallback, else None."""
     if preferred and preferred in df.columns:
         return preferred
     if fallback and fallback in df.columns:
@@ -151,11 +125,9 @@ def classification_at_threshold(
     coverage: np.ndarray,
     threshold: float
 ) -> Optional[Dict[str, Any]]:
-    """
-    Predict positive ("full") if coverage >= threshold.
-    Returns precision/recall/counts, or None if there aren't at least
-    one positive and one negative case after filtering.
-    """
+    """Predict positive ("full") if coverage >= threshold. Returns
+    precision/recall/counts, or None if there isn't at least one
+    positive and one negative case after filtering."""
     m = np.isfinite(y_true) & np.isfinite(coverage)
 
     y = y_true[m].astype(int)
@@ -188,15 +160,17 @@ def classification_at_threshold(
     }
 
 
+# ----------------------------------------------------------------------
+# PLOTTING
+# ----------------------------------------------------------------------
 def plot_pr_curve_for_task(
     task_desc: str,
     metric_curves: List[Tuple[str, np.ndarray, np.ndarray]],
     average_precisions: Dict[str, float],
     out_png: str
 ) -> None:
-    """
-    Plot the full PR curve for a single task (full_brain_mask only),
-    with average precision (AP) annotated on the plot.
+    """Plot the full PR curve for one task, with average precision (AP)
+    annotated.
 
     metric_curves: list of (display_name, recall_array, precision_array)
     average_precisions: dict of display_name -> average precision score
@@ -247,12 +221,9 @@ def plot_confusion_matrix_grid(
     thresholds: List[float],
     out_png: str
 ) -> None:
-    """
-    Plot a grid of 2x2 confusion matrices: rows = metrics, cols = thresholds.
-
-    grid_results[i][j] corresponds to metric i, threshold j, and is the
-    dict returned by classification_at_threshold (or None if unavailable).
-    """
+    """Plot a grid of 2x2 confusion matrices (rows = metrics,
+    cols = thresholds). grid_results[i][j] is the output of
+    classification_at_threshold for metric i, threshold j (or None)."""
     n_rows = len(metric_display_names)
     n_cols = len(thresholds)
 
@@ -273,7 +244,7 @@ def plot_confusion_matrix_grid(
                 ax.set_yticks([])
             else:
                 cm = np.array([[res["tp"], res["fn"]],
-                                [res["fp"], res["tn"]]])
+                               [res["fp"], res["tn"]]])
                 ax.imshow(cm, cmap="Blues")
 
                 labels = [["TP", "FN"], ["FP", "TN"]]
@@ -316,47 +287,42 @@ def plot_confusion_matrix_grid(
     print(f"Saved confusion matrix figure: {out_png}")
 
 
-# =============================================================================
+# ----------------------------------------------------------------------
 # MAIN
-# =============================================================================
-
+# ----------------------------------------------------------------------
 def main():
-    cfg = build_runtime_config(CONFIG)
+    output_csv = os.path.join(OUTPUT_DIR, OUTPUT_CSV_NAME)
 
-    base = cfg["base_path"]
-    input_csv = cfg["input_csv"].format(base=base)
-    output_dir = cfg["output_dir"]
-    output_csv = cfg["output_csv"]
+    if not os.path.exists(INPUT_DATA_PATH):
+        raise FileNotFoundError(f"Input CSV not found: {INPUT_DATA_PATH}")
 
-    if not os.path.exists(input_csv):
-        raise FileNotFoundError(f"Input CSV not found: {input_csv}")
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-    os.makedirs(output_dir, exist_ok=True)
-
-    df = pd.read_csv(input_csv)
+    df = pd.read_csv(INPUT_DATA_PATH)
     df.columns = [c.strip() for c in df.columns]
 
-    for col in ["dataset", "participant_id", cfg["label_col"]]:
+    for col in ["dataset", "participant_id", LABEL_COL]:
         if col not in df.columns:
             raise KeyError(f"Input CSV is missing required column: {col}")
 
     start = datetime.now()
     print(f"Started at {start}")
-    print(f"Input CSV:   {input_csv}")
+    print(f"Input CSV:   {INPUT_DATA_PATH}")
     print(f"Output CSV:  {output_csv}")
-    print(f"Thresholds:  {cfg['thresholds']}")
+    print(f"Thresholds:  {THRESHOLDS}")
     print(f"Rows:        {df.shape[0]}  columns: {df.shape[1]}")
     print(f"Datasets:    {df['dataset'].nunique()}")
 
-    labels = df[cfg["label_col"]].apply(parse_visual_label).values
+    labels = df[LABEL_COL].apply(parse_visual_label).values
 
+    # Threshold results table
     rows: List[Dict[str, Any]] = []
 
-    for task_code, task_desc in cfg["tasks"]:
+    for task_code, task_desc in TASKS:
         y = make_binary(labels, task_code)
 
-        for metric in cfg["metric_order"]:
-            cov_pref, cov_fallback = cfg["coverage_cols"][metric]
+        for metric in METRIC_ORDER:
+            cov_pref, cov_fallback = COVERAGE_COLS[metric]
             cov_col = resolve_col(df, cov_pref, cov_fallback)
 
             if cov_col is None:
@@ -365,7 +331,7 @@ def main():
 
             coverage_raw = pd.to_numeric(df[cov_col], errors="coerce").values
 
-            for threshold in cfg["thresholds"]:
+            for threshold in THRESHOLDS:
                 res = classification_at_threshold(y, coverage_raw, threshold)
 
                 if res is None:
@@ -375,7 +341,7 @@ def main():
                         "analysis": task_code,
                         "analysis_description": task_desc,
                         "metric": metric,
-                        "metric_display_name": cfg["metric_display_names"].get(metric, metric),
+                        "metric_display_name": METRIC_DISPLAY_NAMES.get(metric, metric),
                         "coverage_column": cov_col,
                         "threshold": threshold,
                         "precision": np.nan,
@@ -396,7 +362,7 @@ def main():
                     "analysis": task_code,
                     "analysis_description": task_desc,
                     "metric": metric,
-                    "metric_display_name": cfg["metric_display_names"].get(metric, metric),
+                    "metric_display_name": METRIC_DISPLAY_NAMES.get(metric, metric),
                     "coverage_column": cov_col,
                     "threshold": threshold,
                     "precision": round(float(res["precision"]), 4) if np.isfinite(res["precision"]) else np.nan,
@@ -416,11 +382,9 @@ def main():
     out.to_csv(output_csv, index=False)
     print(f"\nSaved predefined-threshold results to: {output_csv}")
 
-    # -------------------------------------------------------------------
-    # Visualizations: one PR curve (full_brain_mask only) + one confusion
-    # matrix grid (all metrics x all thresholds), per task
-    # -------------------------------------------------------------------
-    for task_code, task_desc in cfg["tasks"]:
+    # Figures per task: PR curve (full_brain_mask only) + confusion
+    # matrix grid (all metrics x all thresholds)
+    for task_code, task_desc in TASKS:
         y = make_binary(labels, task_code)
 
         metric_curves = []
@@ -428,16 +392,16 @@ def main():
         grid_results: List[List[Optional[Dict[str, Any]]]] = []
         metric_display_names = []
 
-        for metric in cfg["metric_order"]:
-            cov_pref, cov_fallback = cfg["coverage_cols"][metric]
+        for metric in METRIC_ORDER:
+            cov_pref, cov_fallback = COVERAGE_COLS[metric]
             cov_col = resolve_col(df, cov_pref, cov_fallback)
             if cov_col is None:
                 continue
 
             coverage_raw = pd.to_numeric(df[cov_col], errors="coerce").values
-            display_name = cfg["metric_display_names"].get(metric, metric)
+            display_name = METRIC_DISPLAY_NAMES.get(metric, metric)
 
-            # full PR curve (sweep all thresholds) : full_brain_mask only 
+            # Full PR curve (sweeps all thresholds), full_brain_mask only
             if metric == "full_brain_mask":
                 m = np.isfinite(y) & np.isfinite(coverage_raw)
                 y_valid = y[m].astype(int)
@@ -448,21 +412,21 @@ def main():
                     metric_curves.append((display_name, recall_curve, precision_curve))
                     average_precisions[display_name] = average_precision_score(y_valid, score)
 
-            # confusion matrices at the predefined thresholds (all metrics) 
+            # Confusion matrices at the predefined thresholds, all metrics
             row_results = []
-            for threshold in cfg["thresholds"]:
+            for threshold in THRESHOLDS:
                 res = classification_at_threshold(y, coverage_raw, threshold)
                 row_results.append(res)
 
             grid_results.append(row_results)
             metric_display_names.append(display_name)
 
-        pr_png = cfg["output_pr_png_template"].format(task=task_code)
+        pr_png = os.path.join(OUTPUT_DIR, PR_CURVE_FIG_TEMPLATE.format(task=task_code))
         plot_pr_curve_for_task(task_desc, metric_curves, average_precisions, pr_png)
 
-        cm_png = cfg["output_cm_png_template"].format(task=task_code)
+        cm_png = os.path.join(OUTPUT_DIR, CONFUSION_MATRIX_FIG_TEMPLATE.format(task=task_code))
         plot_confusion_matrix_grid(
-            task_desc, grid_results, metric_display_names, cfg["thresholds"], cm_png
+            task_desc, grid_results, metric_display_names, THRESHOLDS, cm_png
         )
 
     print(f"Total runtime: {datetime.now() - start}")
