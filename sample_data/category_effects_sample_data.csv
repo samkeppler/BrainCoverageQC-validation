@@ -1,0 +1,121 @@
+dataset,participant_id,visual_qc_full_brain,coverage_full_brain,visual_qc_superior_cerebrum,coverage_superior_cerebrum,visual_qc_inferior_cerebrum,coverage_inferior_cerebrum,visual_qc_cerebellum_and_midbrain,coverage_cerebellum_and_midbrain
+dataset_A,sub-001,cropped,93.795,full,99.804,full,99.938,cropped,87.975
+dataset_A,sub-002,cropped,92.754,cropped,89.346,full,99.689,cropped,83.376
+dataset_A,sub-003,minimally cropped,98.101,full,99.874,minimally cropped,96.562,full,99.935
+dataset_A,sub-004,minimally cropped,99.447,full,99.974,minimally cropped,98.962,full,99.021
+dataset_A,sub-005,minimally cropped,99.434,full,99.755,full,99.75,minimally cropped,97.75
+dataset_A,sub-006,minimally cropped,99.266,full,99.818,full,99.889,minimally cropped,98.391
+dataset_A,sub-007,cropped,90.766,full,99.877,full,99.993,cropped,79.481
+dataset_A,sub-008,cropped,90.464,full,99.852,minimally cropped,94.853,cropped,74.685
+dataset_A,sub-009,minimally cropped,98.002,full,99.954,minimally cropped,95.757,full,100.0
+dataset_A,sub-010,cropped,91.177,minimally cropped,97.397,cropped,81.684,minimally cropped,95.434
+dataset_A,sub-011,minimally cropped,97.248,full,99.833,full,99.822,minimally cropped,95.099
+dataset_A,sub-012,full,99.549,full,99.947,full,99.78,full,99.999
+dataset_A,sub-013,full,99.797,full,99.788,full,99.948,full,99.785
+dataset_A,sub-014,cropped,94.611,cropped,90.682,minimally cropped,97.14,full,99.796
+dataset_A,sub-015,full,99.95,full,99.829,full,99.938,full,99.991
+dataset_A,sub-016,minimally cropped,98.116,minimally cropped,95.282,full,99.968,full,99.633
+dataset_A,sub-017,minimally cropped,97.664,full,99.911,minimally cropped,93.195,full,99.99
+dataset_A,sub-018,minimally cropped,97.638,full,99.995,full,99.593,minimally cropped,95.422
+dataset_A,sub-019,full,99.863,full,99.813,full,99.785,full,99.862
+dataset_A,sub-020,minimally cropped,98.007,full,99.307,full,99.937,minimally cropped,96.209
+dataset_A,sub-021,minimally cropped,98.904,full,99.995,minimally cropped,96.922,full,99.232
+dataset_A,sub-022,cropped,89.468,full,99.806,full,99.95,cropped,81.562
+dataset_A,sub-023,minimally cropped,98.106,full,99.462,full,99.934,minimally cropped,95.934
+dataset_A,sub-024,cropped,96.437,minimally cropped,95.645,full,99.99,cropped,90.374
+dataset_A,sub-025,cropped,89.654,full,99.706,cropped,78.704,minimally cropped,97.92
+dataset_A,sub-026,minimally cropped,97.371,full,99.801,full,100.0,minimally cropped,94.939
+dataset_A,sub-027,full,99.924,full,99.991,full,99.684,full,99.753
+dataset_A,sub-028,cropped,91.475,cropped,83.795,minimally cropped,96.58,full,99.278
+dataset_A,sub-029,minimally cropped,100.0,full,99.989,minimally cropped,100.0,full,100.0
+dataset_A,sub-030,minimally cropped,98.557,full,99.927,full,99.979,minimally cropped,97.23
+dataset_A,sub-031,full,99.648,full,99.874,full,99.527,full,99.744
+dataset_A,sub-032,minimally cropped,98.034,full,99.362,full,99.405,minimally cropped,95.345
+dataset_A,sub-033,cropped,91.463,full,98.856,cropped,82.47,full,99.797
+dataset_A,sub-034,full,99.446,full,99.983,full,99.72,full,99.999
+dataset_A,sub-035,cropped,91.696,full,99.879,full,99.654,cropped,85.118
+dataset_B,sub-036,cropped,97.927,cropped,94.539,full,99.993,minimally cropped,94.637
+dataset_B,sub-037,full,99.872,full,99.968,full,99.874,full,99.966
+dataset_B,sub-038,full,99.437,full,99.933,full,99.805,full,99.552
+dataset_B,sub-039,minimally cropped,96.552,full,99.997,full,99.729,minimally cropped,93.762
+dataset_B,sub-040,cropped,95.261,full,99.677,full,99.906,cropped,88.671
+dataset_B,sub-041,cropped,95.313,full,99.151,full,99.995,cropped,88.794
+dataset_B,sub-042,minimally cropped,98.196,full,99.751,minimally cropped,95.277,full,99.977
+dataset_B,sub-043,full,99.693,full,99.975,full,99.989,full,99.524
+dataset_B,sub-044,minimally cropped,98.601,full,99.988,minimally cropped,96.489,full,99.923
+dataset_B,sub-045,cropped,98.118,full,99.561,minimally cropped,96.146,cropped,98.135
+dataset_B,sub-046,full,100.0,full,99.995,full,99.888,full,99.834
+dataset_B,sub-047,minimally cropped,97.444,minimally cropped,95.318,full,99.939,full,99.442
+dataset_B,sub-048,full,99.796,full,99.956,full,99.914,full,99.889
+dataset_B,sub-049,cropped,90.543,full,99.864,minimally cropped,97.53,cropped,78.247
+dataset_B,sub-050,cropped,88.852,minimally cropped,93.332,full,99.119,cropped,81.226
+dataset_B,sub-051,minimally cropped,99.095,full,99.867,minimally cropped,98.246,minimally cropped,97.881
+dataset_B,sub-052,cropped,97.293,full,99.866,full,99.882,cropped,94.717
+dataset_B,sub-053,cropped,92.771,full,99.49,full,99.885,cropped,82.686
+dataset_B,sub-054,cropped,86.289,full,99.893,minimally cropped,97.748,cropped,76.722
+dataset_B,sub-055,minimally cropped,98.069,full,99.957,full,99.997,minimally cropped,94.564
+dataset_B,sub-056,minimally cropped,98.176,full,99.839,minimally cropped,96.671,full,99.907
+dataset_B,sub-057,minimally cropped,98.206,full,99.986,full,99.183,minimally cropped,96.335
+dataset_B,sub-058,cropped,86.751,minimally cropped,96.234,cropped,77.56,minimally cropped,96.767
+dataset_B,sub-059,minimally cropped,97.821,minimally cropped,95.276,minimally cropped,98.184,minimally cropped,95.262
+dataset_B,sub-060,full,99.796,full,99.591,full,99.714,full,99.671
+dataset_B,sub-061,minimally cropped,98.427,full,98.699,minimally cropped,96.1,full,99.942
+dataset_B,sub-062,cropped,91.258,full,99.971,cropped,84.419,cropped,86.281
+dataset_B,sub-063,cropped,93.383,full,99.905,full,99.223,cropped,86.494
+dataset_B,sub-064,full,99.607,full,99.952,full,99.171,full,99.654
+dataset_B,sub-065,minimally cropped,98.371,full,99.932,full,99.962,minimally cropped,96.827
+dataset_C,sub-066,minimally cropped,98.938,minimally cropped,98.105,full,99.826,full,99.693
+dataset_C,sub-067,full,99.553,full,99.741,full,98.991,full,99.965
+dataset_C,sub-068,cropped,93.95,full,99.995,cropped,87.945,minimally cropped,96.879
+dataset_C,sub-069,cropped,83.428,full,99.464,cropped,71.681,minimally cropped,95.539
+dataset_C,sub-070,full,100.0,full,99.874,full,99.985,full,99.775
+dataset_C,sub-071,full,99.926,full,99.725,full,99.877,full,99.876
+dataset_C,sub-072,cropped,92.828,minimally cropped,95.154,full,99.994,cropped,86.748
+dataset_C,sub-073,minimally cropped,97.682,minimally cropped,95.967,full,98.95,full,99.843
+dataset_C,sub-074,minimally cropped,99.103,full,99.96,minimally cropped,98.528,minimally cropped,100.0
+dataset_C,sub-075,cropped,92.649,minimally cropped,97.749,full,99.626,cropped,84.749
+dataset_C,sub-076,cropped,89.191,full,99.896,cropped,74.434,full,99.624
+dataset_C,sub-077,cropped,90.282,full,99.641,full,99.912,cropped,83.533
+dataset_C,sub-078,cropped,91.862,minimally cropped,96.125,full,99.986,cropped,85.748
+dataset_C,sub-079,minimally cropped,98.82,full,99.979,full,99.839,minimally cropped,96.924
+dataset_C,sub-080,minimally cropped,98.489,full,99.997,minimally cropped,97.186,minimally cropped,98.065
+dataset_C,sub-081,minimally cropped,99.679,full,99.978,minimally cropped,99.013,full,99.546
+dataset_C,sub-082,full,99.556,full,99.952,full,99.405,full,99.929
+dataset_C,sub-083,minimally cropped,98.181,full,99.696,minimally cropped,96.72,full,99.858
+dataset_C,sub-084,minimally cropped,99.29,full,99.845,full,99.67,minimally cropped,98.136
+dataset_C,sub-085,minimally cropped,97.655,full,99.974,full,99.935,minimally cropped,95.34
+dataset_C,sub-086,minimally cropped,96.62,minimally cropped,95.123,minimally cropped,93.789,minimally cropped,97.001
+dataset_C,sub-087,cropped,93.266,cropped,88.714,full,99.994,full,99.282
+dataset_C,sub-088,cropped,97.307,full,99.631,full,99.976,cropped,94.532
+dataset_C,sub-089,full,99.541,full,99.251,full,99.769,full,99.852
+dataset_C,sub-090,minimally cropped,98.311,full,99.732,minimally cropped,96.665,full,99.8
+dataset_C,sub-091,full,99.636,full,99.973,full,99.903,full,99.864
+dataset_C,sub-092,cropped,99.869,cropped,100.0,full,99.685,full,99.998
+dataset_C,sub-093,full,99.485,full,99.281,full,99.632,full,99.862
+dataset_C,sub-094,full,99.874,full,99.789,full,99.856,full,99.617
+dataset_C,sub-095,minimally cropped,99.363,full,99.952,minimally cropped,98.404,full,99.825
+dataset_D,sub-096,minimally cropped,95.706,full,99.608,minimally cropped,92.617,minimally cropped,96.938
+dataset_D,sub-097,minimally cropped,97.625,minimally cropped,95.571,minimally cropped,98.118,full,99.413
+dataset_D,sub-098,minimally cropped,99.8,full,99.759,full,99.524,minimally cropped,99.457
+dataset_D,sub-099,cropped,94.184,full,99.961,full,99.784,cropped,84.647
+dataset_D,sub-100,minimally cropped,98.037,full,99.163,full,99.68,minimally cropped,95.218
+dataset_D,sub-101,minimally cropped,98.75,minimally cropped,97.713,full,99.362,full,99.938
+dataset_D,sub-102,minimally cropped,97.626,full,99.543,minimally cropped,96.577,minimally cropped,94.15
+dataset_D,sub-103,minimally cropped,98.802,full,99.528,minimally cropped,97.733,full,99.976
+dataset_D,sub-104,full,99.862,full,99.997,full,99.943,full,99.681
+dataset_D,sub-105,cropped,94.623,full,99.981,minimally cropped,98.312,cropped,88.844
+dataset_D,sub-106,minimally cropped,97.27,full,99.425,full,99.936,minimally cropped,95.218
+dataset_D,sub-107,minimally cropped,98.48,full,99.761,full,99.985,minimally cropped,97.206
+dataset_D,sub-108,cropped,94.24,minimally cropped,94.625,full,99.994,cropped,87.666
+dataset_D,sub-109,minimally cropped,97.079,minimally cropped,94.182,minimally cropped,94.638,full,99.842
+dataset_D,sub-110,minimally cropped,98.03,full,99.393,full,99.7,minimally cropped,95.704
+dataset_D,sub-111,cropped,97.16,full,99.772,cropped,91.603,full,99.972
+dataset_D,sub-112,full,99.725,full,99.98,full,99.982,full,99.83
+dataset_D,sub-113,minimally cropped,98.403,full,99.783,minimally cropped,96.807,full,99.923
+dataset_D,sub-114,full,99.452,full,99.985,full,99.747,full,99.625
+dataset_D,sub-115,cropped,90.688,full,99.918,cropped,82.493,full,99.7
+dataset_D,sub-116,cropped,94.744,cropped,87.778,full,99.997,full,99.956
+dataset_D,sub-117,minimally cropped,98.226,minimally cropped,95.844,full,99.726,minimally cropped,98.958
+dataset_D,sub-118,full,99.785,full,99.657,full,99.88,full,99.841
+dataset_D,sub-119,minimally cropped,98.697,full,99.259,full,99.991,minimally cropped,97.351
+dataset_D,sub-120,minimally cropped,98.871,full,99.989,full,99.937,minimally cropped,97.742
